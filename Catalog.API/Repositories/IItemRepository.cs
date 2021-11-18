@@ -1,9 +1,9 @@
-﻿using Catalog.Entities;
+﻿using Catalog.API.Entities;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Catalog.Repositories {
+namespace Catalog.API.Repositories {
     public interface IItemRepository {
         Item getItem(Guid id);
         Task<Item> getItemAsync(Guid id);

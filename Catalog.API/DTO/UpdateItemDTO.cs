@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Catalog.DTO {
+namespace Catalog.API.DTO {
     public class UpdateItemDTO {
         [Required]
         public string name { get; init; }

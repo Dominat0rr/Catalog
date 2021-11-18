@@ -1,4 +1,4 @@
-﻿using Catalog.Entities;
+﻿using Catalog.API.Entities;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System;
@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Catalog.Repositories {
+namespace Catalog.API.Repositories {
     public class MongoDBItemsRepository : IItemRepository {
         private const string databaseName = "catalog";
         private const string collectionName = "items";

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Catalog.DTO {
+namespace Catalog.API.DTO {
     public record ItemDTO {
         public Guid id { get; init; }
         public string name { get; init; }

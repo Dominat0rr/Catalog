@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Catalog.DTO {
+namespace Catalog.API.DTO {
     public record CreateItemDTO {
         [Required]
         public string name { get; init; }

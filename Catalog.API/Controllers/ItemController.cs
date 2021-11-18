@@ -1,20 +1,23 @@
-﻿using Catalog.DTO;
-using Catalog.Entities;
-using Catalog.Repositories;
+﻿using Catalog.API.DTO;
+using Catalog.API.Entities;
+using Catalog.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Catalog.Controllers {
+namespace Catalog.API.Controllers {
     [ApiController]
     [Route("items")]
     public class ItemController : ControllerBase {
         private readonly IItemRepository repository;
+        private readonly ILogger<ItemController> logger;
 
-        public ItemController(IItemRepository repository) {
+        public ItemController(IItemRepository repository, ILogger<ItemController> logger) {
             this.repository = repository;
+            this.logger = logger;
         }
 
         // GET /items
@@ -23,6 +26,9 @@ namespace Catalog.Controllers {
             //var items = repository.getItems().Select(item => item.asDTO());
             var items = (await repository.getItemsAsync())
                 .Select(item => item.asDTO());
+
+            logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrieved {items}");
+
             return items;
         }
 

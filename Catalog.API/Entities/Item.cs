@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Catalog.Entities {
+namespace Catalog.API.Entities {
     // Record Types:
     // - Use for immutable objects
     // - With -expressions support

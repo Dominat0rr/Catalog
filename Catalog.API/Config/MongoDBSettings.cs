@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Catalog.Config {
+namespace Catalog.API.Config {
     // Mongo DB Docker command:
     // With admin (root) user:
     // docker run -d --rm --name mongo -p 27017:27017 -v mongodbdata:/data/db mongo
