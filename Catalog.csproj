@@ -7,6 +7,7 @@
   <ItemGroup>
     <!-- <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="" /> -->
     <!-- <PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="" /> -->
+    <PackageReference Include="MongoDB.Driver" Version="2.13.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
   </ItemGroup>
 
