@@ -1,5 +1,5 @@
+using Catalog.API;
 using Catalog.API.Controllers;
-using Catalog.API.DTO;
 using Catalog.API.Entities;
 using Catalog.API.Repositories;
 using FluentAssertions;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -40,7 +41,6 @@ namespace Catalog.UnitTests {
 
             // Assert
             result.Result.Should().BeOfType<NotFoundResult>();
-            //Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
@@ -57,16 +57,7 @@ namespace Catalog.UnitTests {
             var result = await controller.getItemAsync(Guid.NewGuid());
 
             // Assert
-            result.Value.Should().BeEquivalentTo(
-                expectedItem,
-                options => options.ComparingByMembers<Item>()
-                );
-
-            //Assert.IsType<ItemDTO>(result.Value);
-            //var dto = (result as ActionResult<ItemDTO>).Value;
-            //Assert.Equal(expectedItem.id, dto.id);
-            //Assert.Equal(expectedItem.name, dto.name);
-            //Assert.Equal(expectedItem.price, dto.price);
+            result.Value.Should().BeEquivalentTo(expectedItem);
         }
 
         [Fact]
@@ -83,19 +74,46 @@ namespace Catalog.UnitTests {
             var result = await controller.getItemsAsync();
 
             // Assert
-            result.Should().BeEquivalentTo(
-                expectedItems,
-                options => options.ComparingByMembers<Item>()
-                );
+            result.Should().BeEquivalentTo(expectedItems);
+        }
+
+        [Fact]
+        public async Task getItemsAsync_WithMatchingItems_ReturnsAllMatchingItems() {
+            // Arrange
+            var allItems = new[] { 
+                new Item() { name = "Potion" },
+                new Item() { name = "Antidote" },
+                new Item() { name = "Medium Potion" },
+                new Item() { name = "Large Potion" },
+                new Item() { name = "Bronze Sword" },
+                new Item() { name = "Iron Sword" },
+                new Item() { name = "Golden Axe" },
+            };
+
+            var nameToMatch = "Potion";
+
+            repositoryStub.Setup(repo => repo.getItemsAsync())
+                .ReturnsAsync(allItems);
+
+            var controller = new ItemController(repositoryStub.Object, loggerStub.Object);
+
+            // Act
+            IEnumerable<ItemDto> foundItems = await controller.getItemsAsync(nameToMatch);
+
+            // Assert
+            foundItems.Should().OnlyContain(
+                item => item.name == allItems[0].name || item.name == allItems[2].name || item.name == allItems[3].name
+            );
         }
 
         [Fact]
         public async Task addItemAsync_WithItemToCreate_ReturnsCreatedItem() {
             // Arrange
-            var itemToCreate = new CreateItemDTO() {
-                name = Guid.NewGuid().ToString(),
-                price = rand.Next(1000)
-            };
+            var itemToCreate = new CreateItemDto(
+                Guid.NewGuid().ToString(), 
+                Guid.NewGuid().ToString(), 
+                rand.Next(1000)
+            );
 
             var controller = new ItemController(repositoryStub.Object, loggerStub.Object);
 
@@ -103,10 +121,10 @@ namespace Catalog.UnitTests {
             var result = await controller.addItemAsync(itemToCreate);
 
             // Assert
-            var createdItem = (result.Result as CreatedAtActionResult).Value as ItemDTO;
+            var createdItem = (result.Result as CreatedAtActionResult).Value as ItemDto;
             itemToCreate.Should().BeEquivalentTo(
                 createdItem,
-                options => options.ComparingByMembers<ItemDTO>().ExcludingMissingMembers()
+                options => options.ComparingByMembers<ItemDto>().ExcludingMissingMembers()
                 );
             createdItem.id.Should().NotBeEmpty();
             createdItem.created.Should().BeCloseTo(DateTimeOffset.UtcNow, TimeSpan.FromMilliseconds(1000));
@@ -121,10 +139,11 @@ namespace Catalog.UnitTests {
                 .ReturnsAsync(existingItem);
 
             var itemId = existingItem.id;
-            var itemToUpdate = new UpdateItemDTO() {
-                name = Guid.NewGuid().ToString(),
-                price = existingItem.price + 3
-            };
+            var itemToUpdate = new UpdateItemDto(
+                Guid.NewGuid().ToString(),
+                Guid.NewGuid().ToString(),
+                existingItem.price + 3
+            );
 
             var controller = new ItemController(repositoryStub.Object, loggerStub.Object);
 
