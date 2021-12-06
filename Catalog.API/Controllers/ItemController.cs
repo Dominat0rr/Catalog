@@ -1,5 +1,4 @@
-﻿using Catalog.API.DTO;
-using Catalog.API.Entities;
+﻿using Catalog.API.Entities;
 using Catalog.API.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -22,10 +21,13 @@ namespace Catalog.API.Controllers {
 
         // GET /items
         [HttpGet]
-        public async Task<IEnumerable<ItemDTO>> getItemsAsync() {
+        public async Task<IEnumerable<ItemDto>> getItemsAsync(string name = null) {
             //var items = repository.getItems().Select(item => item.asDTO());
             var items = (await repository.getItemsAsync())
                 .Select(item => item.asDTO());
+
+            if (!string.IsNullOrWhiteSpace(name))
+                items = items.Where(item => item.name.Contains(name, StringComparison.OrdinalIgnoreCase));
 
             logger.LogInformation($"{DateTime.UtcNow.ToString("hh:mm:ss")}: Retrieved {items}");
 
@@ -34,7 +36,7 @@ namespace Catalog.API.Controllers {
 
         // GET /items/id
         [HttpGet("{id}")]
-        public async Task<ActionResult<ItemDTO>> getItemAsync(Guid id) {
+        public async Task<ActionResult<ItemDto>> getItemAsync(Guid id) {
             //var item = repository.getItem(id);
             var item = await repository.getItemAsync(id);
 
@@ -46,10 +48,11 @@ namespace Catalog.API.Controllers {
 
         // POST /items
         [HttpPost]
-        public async Task<ActionResult<ItemDTO>> addItemAsync(CreateItemDTO itemDto) {
+        public async Task<ActionResult<ItemDto>> addItemAsync(CreateItemDto itemDto) {
             Item item = new() {
                 id = Guid.NewGuid(),
                 name = itemDto.name,
+                description = itemDto.description,
                 price = itemDto.price,
                 created = DateTimeOffset.UtcNow
             };
@@ -61,18 +64,17 @@ namespace Catalog.API.Controllers {
 
         // PUT /items/id
         [HttpPut("{id}")]
-        public async Task<ActionResult> updateItemAsync(Guid id, UpdateItemDTO itemDto) {
+        public async Task<ActionResult> updateItemAsync(Guid id, UpdateItemDto itemDto) {
             var existingItem = await repository.getItemAsync(id);
 
             if (existingItem is null)
                 return NotFound();
 
-            Item updatedItem = existingItem with {
-                name = itemDto.name,
-                price = itemDto.price
-            };
+            existingItem.name = itemDto.name;
+            existingItem.description = itemDto.description;
+            existingItem.price = itemDto.price;
 
-            await repository.updateAsync(updatedItem);
+            await repository.updateAsync(existingItem);
 
             return NoContent();
         }
