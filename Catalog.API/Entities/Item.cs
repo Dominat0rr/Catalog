@@ -8,13 +8,14 @@ namespace Catalog.API.Entities {
     // - Use for immutable objects
     // - With -expressions support
     // - Value-based equality support
-    public record Item {
+    public class Item {
         // init:
         // - Init-only properties (only can be set during initialization)
-        public Guid id { get; init; }
-        public string name { get; init; }
-        public decimal price { get; init; }
-        public DateTimeOffset created { get; init; }
+        public Guid id { get; set; }
+        public string name { get; set; }
+        public string description { get; set; }
+        public decimal price { get; set; }
+        public DateTimeOffset created { get; set; }
 
 
     }
